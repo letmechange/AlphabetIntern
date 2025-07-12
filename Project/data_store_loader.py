@@ -56,7 +56,7 @@ def update_vectorstore_from_folder(folder_path, vectorstore, embedding_model, ma
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=50)
     for path_str in added:
         print(f"Adding/updating: {path_str}")
-        if path_str.endswith(".pdy"):
+        if path_str.endswith(".pdf"):
             loader = PyPDFLoader(path_str)
         elif path_str.endswith(".txt"):
             loader = TextLoader(path_str)
