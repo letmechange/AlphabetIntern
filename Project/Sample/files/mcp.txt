@@ -1,0 +1,41 @@
+The Model Context Protocol (MCP) is an open standard, open-source framework introduced by Anthropic in November 2024 to standardize the way artificial intelligence (AI) systems like large language models (LLMs) integrate and share data with external tools, systems, and data sources.[1] MCP provides a universal interface for reading files, executing functions, and handling contextual prompts.[2] Following its announcement, the protocol was adopted by major AI providers, including OpenAI and Google DeepMind.
+
+
+
+Background
+The protocol was announced by Anthropic in November 2024 as an open standard[5] for connecting AI assistants to data systems such as content repositories, business management tools, and development environments.[6] It aims to address the challenge of information silos and legacy systems.[6] Before MCP, developers often had to build custom connectors for each data source or tool, resulting in what Anthropic described as an "N×M" data integration problem.[6]
+Earlier stop-gap approaches - such as OpenAI’s 2023 “function-calling” API and the ChatGPT plug-in framework - solved similar problems but required vendor-specific connectors.[7] MCP’s authors note that the protocol deliberately re-uses the message-flow ideas of the Language Server Protocol (LSP) and is transported over JSON-RPC 2.0.[8]
+
+Features
+MCP defines a standardized framework for integrating AI systems with external data sources and tools.[2] It includes specifications for data ingestion and transformation, contextual metadata tagging, and AI interoperability across different platforms. The protocol also supports secure, bidirectional connections between data sources and AI-powered tools.[6]
+
+MCP enables developers to expose their data via MCP servers or to develop AI applications—referred to as MCP clients—that connect to these servers.[6] Key components of the protocol include a formal protocol specification and software development kits (SDKs), local MCP server support in Claude Desktop applications, and an open-source repository of MCP server implementations.[6]
+
+Applications
+MCP has been applied in domains such as software development, business process automation, and natural language automation.
+
+One prominent use case is in desktop assistants, where applications such as the Claude Desktop app deploy local MCP servers to enable secure access to system tools and user files. In enterprise settings, internal assistants are enhanced with MCP to retrieve data from proprietary documents, CRM systems, and internal knowledge bases—companies like Block have integrated MCP into their internal tooling for this purpose.[6]
+
+MCP also plays a critical role in multi-tool agent workflows, allowing agentic AI systems to coordinate multiple tools—for example, combining document lookup with messaging APIs—to support advanced, chain-of-thought reasoning across distributed resources.[citation needed]
+
+In the field of natural language data access, MCP enables applications such as AI2SQL to bridge language models with structured databases, allowing plain-language queries.[8]
+
+MCP has been adopted for academic research workflows through integrations with reference management systems like Zotero. Multiple server implementations allow researchers to perform semantic searches across their libraries, extract PDF annotations, and generate literature reviews through AI-assisted analysis.[9][10][11]
+
+The protocol has become increasingly common in software development tools. Integrated development environments (IDEs) like Zed, coding platforms such as Replit, and code intelligence tools like Sourcegraph have adopted MCP to grant AI coding assistants real-time access to project context. This integration is especially valuable for workflows like "vibe coding", where continuous, adaptive assistance is essential.[5]
+
+In web application development, companies like Wix have embedded MCP servers into their platforms. This allows AI tools to interact with live website data, enabling dynamic content generation and on-the-fly edits. Such capabilities are central to Wix’s AI-driven development tools.[12][13]
+
+Implementation
+The protocol was released with software development kits (SDKs) in programming languages including Python, TypeScript, C# and Java.[8][14] Anthropic maintains an open-source repository of reference MCP server implementations for popular enterprise systems including Google Drive, Slack, GitHub, Git, Postgres, Puppeteer and Stripe.[15] Developers can create custom MCP servers to connect proprietary systems or specialized data sources to AI systems.[15]
+
+The protocol's open standard allows organizations to build tailored connections while maintaining compatibility with the broader MCP ecosystem. AI systems can then leverage these custom connections to provide domain-specific assistance while respecting data access permissions.[6]
+
+Adoption
+In March 2025, OpenAI officially adopted the MCP, following a decision to integrate the standard across its products, including the ChatGPT desktop app, OpenAI's Agents SDK, and the Responses API. Sam Altman described the adoption of MCP as a step toward standardizing AI tool connectivity. Prior to OpenAI's adoption, the potential benefits of MCP had been discussed extensively within the developer community, particularly for simplifying development in multi-model environments.[3][2]
+
+By adopting MCP, OpenAI joins other organizations such as Block, Replit, and Sourcegraph in incorporating the protocol into their platforms. This wide adoption highlights MCP's potential to become a universal open standard for AI system connectivity and interoperability.[3] MCP can be integrated with Microsoft Semantic Kernel,[16] and Azure OpenAI.[17] MCP servers can be deployed to Cloudflare.[18]
+
+Demis Hassabis, CEO of Google DeepMind, confirmed in April 2025 MCP support in the upcoming Gemini models and related infrastructure, describing the protocol as "rapidly becoming an open standard for the AI agentic era".[4]
+
+Many MCP servers have since been added, allowing integration of LLMs with diverse applications.[19]

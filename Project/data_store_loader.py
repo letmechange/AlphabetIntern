@@ -2,8 +2,8 @@
 # import faiss
 import time
 # from langchain.vectorstores import Chroma
-from langchain.document_loaders import PyPDFLoader, TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 # from langchain_community.vectorstores import FAISS
 # from langchain_weaviate.vectorstores import WeaviateVectorStore
 import hashlib, json
@@ -59,10 +59,16 @@ def update_vectorstore_from_folder(folder_path, vectorstore, embedding_model, ma
         if path_str.endswith(".pdf"):
             loader = PyPDFLoader(path_str)
         elif path_str.endswith(".txt"):
-            loader = TextLoader(path_str)
+            loader = TextLoader(path_str, autodetect_encoding=True)
         else:
             continue
-        pages = loader.load()
+        try:
+            pages = loader.load()
+        except Exception as e:
+            print(f"load files {path_str} appears error: {e}")
+            import traceback
+            traceback.print_exc()
+            continue
         docs = splitter.split_documents(pages)
         for doc in docs:
             doc.metadata['source'] = path_str

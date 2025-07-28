@@ -45,15 +45,15 @@ def get_api_key(provider: str, env_var: str) -> str:
         return api_key
     
     # 如果环境变量中没有或无效，提示用户输入
-    print(f"\n🔑 需要配置 {provider} API密钥")
+    print(f"\n 需要配置 {provider} API密钥")
     print("请从以下位置获取API密钥:")
     
     if provider.lower() == "azure":
         print("  - Azure OpenAI: https://portal.azure.com/")
         print("  - 或使用环境变量: AZURE_OPENAI_API_KEY")
-    # elif provider.lower() == "deepseek":
-    #     print("  - DeepSeek: https://platform.deepseek.com/")
-    #     print("  - 或使用环境变量: DEEPSEEK_API_KEY")
+    elif provider.lower() == "deepseek":
+        print("  - DeepSeek: https://platform.deepseek.com/")
+        print("  - 或使用环境变量: DEEPSEEK_API_KEY")
     
     while True:
         try:
@@ -62,16 +62,16 @@ def get_api_key(provider: str, env_var: str) -> str:
             if validate_api_key(api_key, provider):
                 # 设置环境变量
                 os.environ[env_var] = api_key
-                print(f"✅ {provider} API密钥已配置")
+                print(f"{provider} API密钥已配置")
                 return api_key
             else:
-                print(f"❌ API密钥格式无效，请重新输入")
+                print(f"API密钥格式无效，请重新输入")
                 
         except KeyboardInterrupt:
-            print("\n❌ 用户取消操作")
+            print("\n用户取消操作")
             raise SystemExit(1)
         except Exception as e:
-            print(f"❌ 输入错误: {str(e)}")
+            print(f"输入错误: {str(e)}")
 
 def setup_azure_openai():
     """配置Azure OpenAI"""
@@ -82,7 +82,7 @@ def setup_azure_openai():
     if not endpoint:
         endpoint = "https://sweet-m55d9k6j-eastus2.openai.azure.com/openai/deployments/yu-gpt-4o/chat/completions?api-version=2025-01-01-preview"
         os.environ["AZURE_OPENAI_ENDPOINT"] = endpoint
-        print("ℹ️  使用默认Azure OpenAI端点")
+        print("使用默认Azure OpenAI端点")
     
     return api_key, endpoint
 
@@ -104,7 +104,7 @@ def validate_config():
             missing_vars.append(f"{description} ({var})")
     
     if missing_vars:
-        print("⚠️  缺少以下配置:")
+        print("  缺少以下配置:")
         for var in missing_vars:
             print(f"  - {var}")
         return False
@@ -115,18 +115,18 @@ def validate_config():
 try:
     azure_api_key, azure_endpoint = setup_azure_openai()
 except SystemExit:
-    print("❌ 配置失败，程序退出")
+    print("配置失败，程序退出")
     exit(1)
 
 # 配置DeepSeek (可选)
 try:
     deepseek_api_key = setup_deepseek()
 except SystemExit:
-    print("⚠️  DeepSeek配置跳过，将仅使用Azure OpenAI")
+    print(" DeepSeek配置跳过，将仅使用Azure OpenAI")
 
 # 验证配置
 if not validate_config():
-    print("❌ 配置验证失败")
+    print("配置验证失败")
     exit(1)
 
-print("✅ 配置完成")
+print(" 配置完成")

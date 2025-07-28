@@ -1,7 +1,7 @@
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 class Embedding:
-    def __init__(self, provider="huggingface", model_name="all-MiniLM-L6-v2", **kwargs):
+    def __init__(self, provider="huggingface", model_name="BAAI/bge-m3", **kwargs):
         """
         Load embedding model from the specified provider.
         

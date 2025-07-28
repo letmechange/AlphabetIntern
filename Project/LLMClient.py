@@ -1,4 +1,4 @@
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_deepseek import ChatDeepSeek
 from langchain_openai import AzureChatOpenAI
 
