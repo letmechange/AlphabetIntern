@@ -1,34 +1,34 @@
 #!/usr/bin/env python3
 """
-HelpSteer功能测试脚本
-验证HelpSteer系统是否正常工作
+HelpSteer Functionality Test Script
+Verifies that the HelpSteer system is working properly
 """
 
 import os
 import sys
 from typing import Dict, Any
 
-# 导入项目模块
+# Import project modules
 from config import *
 from LLMClient import LLM_Client
 from HelpSteer import HelpSteerSystem, EvaluationDimension
 
 
 def test_llm_connection():
-    """测试LLM连接"""
-    print("=== 测试LLM连接 ===")
+    """Test LLM connection"""
+    print("=== Testing LLM Connection ===")
     
     try:
-        # 检查环境变量
+        # Check environment variables
         api_key = os.getenv("AZURE_OPENAI_API_KEY")
         endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
         
         if not api_key or not endpoint:
-            print("❌ 缺少必要的环境变量")
-            print("请设置 AZURE_OPENAI_API_KEY 和 AZURE_OPENAI_ENDPOINT")
+            print("❌ Missing necessary environment variables")
+            print("Please set AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT")
             return False
         
-        # 初始化LLM客户端
+        # Initialize LLM client
         llm_client = LLM_Client(
             api_key=api_key,
             model_name="gpt-4",
@@ -38,42 +38,42 @@ def test_llm_connection():
             api_version="2025-01-01-preview"
         )
         
-        # 测试简单调用
+        # Test simple call
         test_prompt = "请回答：1+1等于几？"
         response = llm_client.call_llm_api(test_prompt)
         
         if response and len(response.strip()) > 0:
-            print("✅ LLM连接测试成功")
-            print(f"测试响应: {response.strip()}")
+            print("✅ LLM connection test successful")
+            print(f"Test response: {response.strip()}")
             return llm_client
         else:
-            print("❌ LLM响应为空")
+            print("❌ LLM response is empty")
             return False
             
     except Exception as e:
-        print(f"❌ LLM连接测试失败: {e}")
+        print(f"❌ LLM connection test failed: {e}")
         return False
 
 
 def test_helpsteer_initialization(llm_client):
-    """测试HelpSteer初始化"""
-    print("\n=== 测试HelpSteer初始化 ===")
+    """Test HelpSteer initialization"""
+    print("\n=== Testing HelpSteer Initialization ===")
     
     try:
         helpsteer = HelpSteerSystem(llm_client)
-        print("✅ HelpSteer系统初始化成功")
+        print("✅ HelpSteer system initialization successful")
         return helpsteer
     except Exception as e:
-        print(f"❌ HelpSteer初始化失败: {e}")
+        print(f"❌ HelpSteer initialization failed: {e}")
         return None
 
 
 def test_evaluation(helpsteer):
-    """测试评估功能"""
-    print("\n=== 测试评估功能 ===")
+    """Test evaluation functionality"""
+    print("\n=== Testing Evaluation Functionality ===")
     
     try:
-        # 测试数据
+        # Test data
         query = "什么是人工智能？"
         context = """
         人工智能(AI)是计算机科学的一个分支，旨在创建能够执行通常需要人类智能的任务的系统。
@@ -86,32 +86,32 @@ def test_evaluation(helpsteer):
         AI技术已经在许多领域得到应用，如自动驾驶汽车、医疗诊断和推荐系统。
         """
         
-        # 执行评估
+        # Execute evaluation
         evaluation = helpsteer.evaluator.evaluate_response(query, response, context)
         
-        # 验证结果
+        # Verify results
         if hasattr(evaluation, 'overall_score') and hasattr(evaluation, 'scores'):
-            print("✅ 评估功能测试成功")
-            print(f"综合分数: {evaluation.overall_score}/10")
-            print("各维度分数:")
+            print("✅ Evaluation functionality test successful")
+            print(f"Overall Score: {evaluation.overall_score}/10")
+            print("Dimension Scores:")
             for dim, score in evaluation.scores.items():
                 print(f"  {dim.value}: {score}/10")
             return True
         else:
-            print("❌ 评估结果格式不正确")
+            print("❌ Evaluation result format incorrect")
             return False
             
     except Exception as e:
-        print(f"❌ 评估功能测试失败: {e}")
+        print(f"❌ Evaluation functionality test failed: {e}")
         return False
 
 
 def test_improvement(helpsteer):
-    """测试改进功能"""
-    print("\n=== 测试改进功能 ===")
+    """Test improvement functionality"""
+    print("\n=== Testing Improvement Functionality ===")
     
     try:
-        # 测试数据
+        # Test data
         query = "解释机器学习的基本概念"
         context = """
         机器学习是人工智能的一个分支，它使计算机能够在没有明确编程的情况下学习和改进。
@@ -124,40 +124,40 @@ def test_improvement(helpsteer):
         有很多种机器学习算法。
         """
         
-        # 指定改进目标
+        # Specify improvement targets
         improvement_targets = ["clarity", "helpfulness"]
         
-        # 执行改进
+        # Execute improvement
         result = helpsteer.evaluate_and_improve(
             query, context, response, improvement_targets
         )
         
-        # 验证结果
+        # Verify results
         if result and "improved_response" in result:
-            print("✅ 改进功能测试成功")
-            print(f"原始响应分数: {result['evaluation'].overall_score}/10")
+            print("✅ Improvement functionality test successful")
+            print(f"Original Response Score: {result['evaluation'].overall_score}/10")
             
             if result["improved_response"]:
-                print(f"改进后响应分数: {result['improved_evaluation'].overall_score}/10")
-                print(f"分数提升: {result['improvement_analysis']['score_improvement']:.2f}")
-                print("改进后的响应:")
+                print(f"Improved Response Score: {result['improved_evaluation'].overall_score}/10")
+                print(f"Score Improvement: {result['improvement_analysis']['score_improvement']:.2f}")
+                print("Improved Response:")
                 print(result["improved_response"])
             return True
         else:
-            print("❌ 改进结果格式不正确")
+            print("❌ Improvement result format incorrect")
             return False
             
     except Exception as e:
-        print(f"❌ 改进功能测试失败: {e}")
+        print(f"❌ Improvement functionality test failed: {e}")
         return False
 
 
 def test_preference_learning(helpsteer):
-    """测试偏好学习功能"""
-    print("\n=== 测试偏好学习功能 ===")
+    """Test preference learning functionality"""
+    print("\n=== Testing Preference Learning Functionality ===")
     
     try:
-        # 测试数据
+        # Test data
         query = "什么是深度学习？"
         context = """
         深度学习是机器学习的一个分支，它使用多层神经网络来模拟人脑的学习过程。
@@ -177,33 +177,33 @@ def test_preference_learning(helpsteer):
         这样可以学习到更复杂的东西。
         """
         
-        # 生成偏好数据
+        # Generate preference data
         preference_data = helpsteer.trainer.generate_preference_data(
             query, context, response_a, response_b
         )
         
-        # 验证结果
+        # Verify results
         if preference_data and "better_response" in preference_data:
-            print("✅ 偏好学习功能测试成功")
-            print(f"更好的响应分数: {preference_data['better_score']}/10")
-            print(f"较差的响应分数: {preference_data['worse_score']}/10")
-            print(f"分数差异: {preference_data['score_difference']:.2f}")
+            print("✅ Preference learning functionality test successful")
+            print(f"Better Response Score: {preference_data['better_score']}/10")
+            print(f"Worse Response Score: {preference_data['worse_score']}/10")
+            print(f"Score Difference: {preference_data['score_difference']:.2f}")
             return True
         else:
-            print("❌ 偏好数据格式不正确")
+            print("❌ Preference data format incorrect")
             return False
             
     except Exception as e:
-        print(f"❌ 偏好学习功能测试失败: {e}")
+        print(f"❌ Preference learning functionality test failed: {e}")
         return False
 
 
 def test_batch_processing(helpsteer):
-    """测试批量处理功能"""
-    print("\n=== 测试批量处理功能 ===")
+    """Test batch processing functionality"""
+    print("\n=== Testing Batch Processing Functionality ===")
     
     try:
-        # 测试数据
+        # Test data
         test_cases = [
             {
                 "query": "什么是神经网络？",
@@ -219,7 +219,7 @@ def test_batch_processing(helpsteer):
         
         results = []
         for i, test_case in enumerate(test_cases, 1):
-            print(f"处理测试用例 {i}...")
+            print(f"Processing test case {i}...")
             
             evaluation = helpsteer.evaluator.evaluate_response(
                 test_case["query"], 
@@ -232,94 +232,94 @@ def test_batch_processing(helpsteer):
                 "score": evaluation.overall_score
             })
         
-        # 验证结果
+        # Verify results
         if len(results) == len(test_cases):
-            print("✅ 批量处理功能测试成功")
+            print("✅ Batch processing functionality test successful")
             for result in results:
-                print(f"用例 {result['case']}: {result['score']:.2f}/10")
+                print(f"Case {result['case']}: {result['score']:.2f}/10")
             return True
         else:
-            print("❌ 批量处理结果不完整")
+            print("❌ Batch processing results incomplete")
             return False
             
     except Exception as e:
-        print(f"❌ 批量处理功能测试失败: {e}")
+        print(f"❌ Batch processing functionality test failed: {e}")
         return False
 
 
 def run_all_tests():
-    """运行所有测试"""
-    print("HelpSteer功能测试")
+    """Run all tests"""
+    print("HelpSteer Functionality Testing")
     print("=" * 50)
     
-    # 测试结果统计
+    # Test result statistics
     test_results = {}
     
-    # 1. 测试LLM连接
+    # 1. Test LLM connection
     llm_client = test_llm_connection()
     test_results["llm_connection"] = llm_client is not False
     
     if not llm_client:
-        print("\n❌ LLM连接失败，无法继续测试")
+        print("\n❌ LLM connection failed, cannot continue testing")
         return test_results
     
-    # 2. 测试HelpSteer初始化
+    # 2. Test HelpSteer initialization
     helpsteer = test_helpsteer_initialization(llm_client)
     test_results["helpsteer_init"] = helpsteer is not None
     
     if not helpsteer:
-        print("\n❌ HelpSteer初始化失败，无法继续测试")
+        print("\n❌ HelpSteer initialization failed, cannot continue testing")
         return test_results
     
-    # 3. 测试评估功能
+    # 3. Test evaluation functionality
     test_results["evaluation"] = test_evaluation(helpsteer)
     
-    # 4. 测试改进功能
+    # 4. Test improvement functionality
     test_results["improvement"] = test_improvement(helpsteer)
     
-    # 5. 测试偏好学习功能
+    # 5. Test preference learning functionality
     test_results["preference_learning"] = test_preference_learning(helpsteer)
     
-    # 6. 测试批量处理功能
+    # 6. Test batch processing functionality
     test_results["batch_processing"] = test_batch_processing(helpsteer)
     
-    # 显示测试总结
+    # Display test summary
     print("\n" + "=" * 50)
-    print("测试总结:")
+    print("Test Summary:")
     
     total_tests = len(test_results)
     passed_tests = sum(test_results.values())
     
     for test_name, result in test_results.items():
-        status = "✅ 通过" if result else "❌ 失败"
+        status = "✅ Passed" if result else "❌ Failed"
         print(f"  {test_name}: {status}")
     
-    print(f"\n总体结果: {passed_tests}/{total_tests} 个测试通过")
+    print(f"\nOverall Result: {passed_tests}/{total_tests} tests passed")
     
     if passed_tests == total_tests:
-        print("🎉 所有测试通过！HelpSteer系统工作正常。")
+        print("🎉 All tests passed! HelpSteer system is working properly.")
     else:
-        print("⚠️  部分测试失败，请检查相关功能。")
+        print("⚠️  Some tests failed, please check related functionality.")
     
     return test_results
 
 
 def main():
-    """主函数"""
+    """Main function"""
     try:
         results = run_all_tests()
         
-        # 根据测试结果决定退出码
+        # Determine exit code based on test results
         if all(results.values()):
-            sys.exit(0)  # 成功
+            sys.exit(0)  # Success
         else:
-            sys.exit(1)  # 失败
+            sys.exit(1)  # Failure
             
     except KeyboardInterrupt:
-        print("\n测试被用户中断")
+        print("\nTesting interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n测试过程中出现未预期的错误: {e}")
+        print(f"\nUnexpected error during testing: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

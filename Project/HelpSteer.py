@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-HelpSteer集成模块
-实现nVidia HelpSteer技术的核心功能，包括多维度评估和偏好学习
+HelpSteer Integration Module
+Implements core functionality of nVidia HelpSteer technology, including multi-dimensional evaluation and preference learning
 """
 
 import json
@@ -15,17 +15,17 @@ from langchain.chains import LLMChain
 
 
 class EvaluationDimension(Enum):
-    """评估维度枚举"""
-    HELPFULNESS = "helpfulness"  # 有用性
-    CORRECTNESS = "correctness"  # 正确性
-    CLARITY = "clarity"          # 清晰度
-    CONCISENESS = "conciseness"  # 简洁性
-    RELEVANCE = "relevance"      # 相关性
+    """Evaluation dimension enumeration"""
+    HELPFULNESS = "helpfulness"  # Helpfulness
+    CORRECTNESS = "correctness"  # Correctness
+    CLARITY = "clarity"          # Clarity
+    CONCISENESS = "conciseness"  # Conciseness
+    RELEVANCE = "relevance"      # Relevance
 
 
 @dataclass
 class HelpSteerResponse:
-    """HelpSteer响应数据结构"""
+    """HelpSteer response data structure"""
     query: str
     response: str
     context: str
@@ -35,17 +35,17 @@ class HelpSteerResponse:
 
 
 class HelpSteerEvaluator:
-    """HelpSteer评估器"""
+    """HelpSteer evaluator"""
     
     def __init__(self, llm_client):
         self.llm_client = llm_client
         self.evaluation_prompts = self._build_evaluation_prompts()
     
     def _build_evaluation_prompts(self) -> Dict[EvaluationDimension, PromptTemplate]:
-        """构建各维度的评估prompt"""
+        """Build evaluation prompts for each dimension"""
         prompts = {}
         
-        # 有用性评估
+        # Helpfulness evaluation
         prompts[EvaluationDimension.HELPFULNESS] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
@@ -69,7 +69,7 @@ Score (1-10):
 """
         )
         
-        # 正确性评估
+        # Correctness evaluation
         prompts[EvaluationDimension.CORRECTNESS] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
@@ -93,7 +93,7 @@ Score (1-10):
 """
         )
         
-        # 清晰度评估
+        # Clarity evaluation
         prompts[EvaluationDimension.CLARITY] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
@@ -117,7 +117,7 @@ Score (1-10):
 """
         )
         
-        # 简洁性评估
+        # Conciseness evaluation
         prompts[EvaluationDimension.CONCISENESS] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
@@ -141,7 +141,7 @@ Score (1-10):
 """
         )
         
-        # 相关性评估
+        # Relevance evaluation
         prompts[EvaluationDimension.RELEVANCE] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
@@ -168,24 +168,24 @@ Score (1-10):
         return prompts
     
     def evaluate_response(self, query: str, response: str, context: str) -> HelpSteerResponse:
-        """评估单个响应"""
+        """Evaluate a single response"""
         scores = {}
         
-        # 对每个维度进行评估
+        # Evaluate each dimension
         for dimension in EvaluationDimension:
             prompt = self.evaluation_prompts[dimension]
             chain = LLMChain(llm=self.llm_client.llm, prompt=prompt)
             
             try:
                 score_str = chain.run(query=query, response=response, context=context).strip()
-                # 提取数字分数
+                # Extract numeric score
                 score = self._extract_score(score_str)
                 scores[dimension] = score
             except Exception as e:
-                print(f"评估维度 {dimension.value} 时出错: {e}")
-                scores[dimension] = 5.0  # 默认中等分数
+                print(f"Error evaluating dimension {dimension.value}: {e}")
+                scores[dimension] = 5.0  # Default medium score
         
-        # 计算综合分数（加权平均）
+        # Calculate overall score (weighted average)
         overall_score = self._calculate_overall_score(scores)
         
         return HelpSteerResponse(
@@ -201,23 +201,23 @@ Score (1-10):
         )
     
     def _extract_score(self, score_str: str) -> float:
-        """从评估结果中提取分数"""
+        """Extract score from evaluation result"""
         try:
-            # 尝试直接解析数字
+            # Try to parse number directly
             score = float(score_str)
-            return max(1.0, min(10.0, score))  # 限制在1-10范围内
+            return max(1.0, min(10.0, score))  # Limit to 1-10 range
         except ValueError:
-            # 如果直接解析失败，尝试从文本中提取数字
+            # If direct parsing fails, try to extract number from text
             import re
             numbers = re.findall(r'\d+(?:\.\d+)?', score_str)
             if numbers:
                 score = float(numbers[0])
                 return max(1.0, min(10.0, score))
-            return 5.0  # 默认分数
+            return 5.0  # Default score
     
     def _calculate_overall_score(self, scores: Dict[EvaluationDimension, float]) -> float:
-        """计算综合分数"""
-        # 可以设置不同维度的权重
+        """Calculate overall score"""
+        # Can set different weights for different dimensions
         weights = {
             EvaluationDimension.HELPFULNESS: 0.3,
             EvaluationDimension.CORRECTNESS: 0.3,
@@ -231,7 +231,7 @@ Score (1-10):
 
 
 class HelpSteerTrainer:
-    """HelpSteer训练器"""
+    """HelpSteer trainer"""
     
     def __init__(self, llm_client, evaluator: HelpSteerEvaluator):
         self.llm_client = llm_client
@@ -239,7 +239,7 @@ class HelpSteerTrainer:
         self.preference_prompt = self._build_preference_prompt()
     
     def _build_preference_prompt(self) -> PromptTemplate:
-        """构建偏好学习prompt"""
+        """Build preference learning prompt"""
         return PromptTemplate(
             input_variables=["query", "context", "better_response", "worse_response"],
             template="""
@@ -266,12 +266,12 @@ Analysis:
     
     def generate_preference_data(self, query: str, context: str, 
                                response_a: str, response_b: str) -> Dict[str, Any]:
-        """生成偏好数据"""
-        # 评估两个响应
+        """Generate preference data"""
+        # Evaluate two responses
         eval_a = self.evaluator.evaluate_response(query, response_a, context)
         eval_b = self.evaluator.evaluate_response(query, response_b, context)
         
-        # 确定哪个更好
+        # Determine which is better
         if eval_a.overall_score > eval_b.overall_score:
             better_response = response_a
             worse_response = response_b
@@ -283,7 +283,7 @@ Analysis:
             better_score = eval_b.overall_score
             worse_score = eval_a.overall_score
         
-        # 生成偏好分析
+        # Generate preference analysis
         chain = LLMChain(llm=self.llm_client.llm, prompt=self.preference_prompt)
         analysis = chain.run(
             query=query,
@@ -308,20 +308,20 @@ Analysis:
         }
     
     def save_preference_data(self, data: Dict[str, Any], filepath: str):
-        """保存偏好数据"""
+        """Save preference data"""
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
         
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     
     def load_preference_data(self, filepath: str) -> Dict[str, Any]:
-        """加载偏好数据"""
+        """Load preference data"""
         with open(filepath, 'r', encoding='utf-8') as f:
             return json.load(f)
 
 
 class HelpSteerPromptOptimizer:
-    """HelpSteer提示优化器"""
+    """HelpSteer prompt optimizer"""
     
     def __init__(self, llm_client, evaluator: HelpSteerEvaluator):
         self.llm_client = llm_client
@@ -329,7 +329,7 @@ class HelpSteerPromptOptimizer:
         self.optimization_prompt = self._build_optimization_prompt()
     
     def _build_optimization_prompt(self) -> PromptTemplate:
-        """构建提示优化prompt"""
+        """Build prompt optimization prompt"""
         return PromptTemplate(
             input_variables=["query", "context", "current_response", "evaluation", "target_improvements"],
             template="""
@@ -353,17 +353,17 @@ Improved Response:
     
     def optimize_response(self, query: str, context: str, current_response: str,
                          target_improvements: List[str]) -> str:
-        """优化响应"""
-        # 评估当前响应
+        """Optimize response"""
+        # Evaluate current response
         evaluation = self.evaluator.evaluate_response(query, current_response, context)
         
-        # 格式化评估结果
+        # Format evaluation results
         eval_text = "\n".join([
             f"- {dim.value}: {score}/10" 
             for dim, score in evaluation.scores.items()
         ])
         
-        # 生成优化提示
+        # Generate optimization prompt
         chain = LLMChain(llm=self.llm_client.llm, prompt=self.optimization_prompt)
         improved_response = chain.run(
             query=query,
@@ -377,7 +377,7 @@ Improved Response:
 
 
 class HelpSteerSystem:
-    """HelpSteer完整系统"""
+    """Complete HelpSteer system"""
     
     def __init__(self, llm_client):
         self.llm_client = llm_client
@@ -387,8 +387,8 @@ class HelpSteerSystem:
     
     def evaluate_and_improve(self, query: str, context: str, response: str,
                            improvement_targets: List[str] = None) -> Dict[str, Any]:
-        """评估并改进响应"""
-        # 评估当前响应
+        """Evaluate and improve response"""
+        # Evaluate current response
         evaluation = self.evaluator.evaluate_response(query, response, context)
         
         result = {
@@ -398,13 +398,13 @@ class HelpSteerSystem:
             "improvement_analysis": None
         }
         
-        # 如果需要改进
+        # If improvement is needed
         if improvement_targets:
             improved_response = self.optimizer.optimize_response(
                 query, context, response, improvement_targets
             )
             
-            # 评估改进后的响应
+            # Evaluate improved response
             improved_evaluation = self.evaluator.evaluate_response(
                 query, improved_response, context
             )
@@ -424,21 +424,21 @@ class HelpSteerSystem:
     def generate_training_data(self, queries: List[str], contexts: List[str],
                              responses_a: List[str], responses_b: List[str],
                              output_file: str):
-        """生成训练数据"""
+        """Generate training data"""
         training_data = []
         
         for i, (query, context, resp_a, resp_b) in enumerate(
             zip(queries, contexts, responses_a, responses_b)
         ):
-            print(f"处理第 {i+1}/{len(queries)} 个样本...")
+            print(f"Processing sample {i+1}/{len(queries)}...")
             
             preference_data = self.trainer.generate_preference_data(
                 query, context, resp_a, resp_b
             )
             training_data.append(preference_data)
         
-        # 保存训练数据
+        # Save training data
         self.trainer.save_preference_data(training_data, output_file)
-        print(f"训练数据已保存到: {output_file}")
+        print(f"Training data saved to: {output_file}")
         
         return training_data 

@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 """
-HelpSteer使用示例
-演示如何使用HelpSteer系统进行响应评估和改进
+HelpSteer Usage Examples
+Demonstrates how to use the HelpSteer system for response evaluation and improvement
 """
 
 import os
 import sys
 from typing import List, Dict, Any
 
-# 导入项目模块
+# Import project modules
 from config import *
 from LLMClient import LLM_Client
 from HelpSteer import HelpSteerSystem, EvaluationDimension
 
 
 def setup_llm_client():
-    """设置LLM客户端"""
-    # 使用Azure OpenAI
+    """Setup LLM client"""
+    # Use Azure OpenAI
     api_key = os.getenv("AZURE_OPENAI_API_KEY")
     endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
     
     if not api_key or not endpoint:
-        print("请先配置Azure OpenAI API密钥和端点")
+        print("Please configure Azure OpenAI API key and endpoint first")
         return None
     
     return LLM_Client(
@@ -35,18 +35,18 @@ def setup_llm_client():
 
 
 def example_evaluation():
-    """示例：评估单个响应"""
-    print("=== HelpSteer响应评估示例 ===")
+    """Example: Evaluate a single response"""
+    print("=== HelpSteer Response Evaluation Example ===")
     
-    # 设置LLM客户端
+    # Setup LLM client
     llm_client = setup_llm_client()
     if not llm_client:
         return
     
-    # 初始化HelpSteer系统
+    # Initialize HelpSteer system
     helpsteer = HelpSteerSystem(llm_client)
     
-    # 示例数据
+    # Example data
     query = "什么是人工智能？"
     context = """
     人工智能(AI)是计算机科学的一个分支，旨在创建能够执行通常需要人类智能的任务的系统。
@@ -59,37 +59,37 @@ def example_evaluation():
     AI技术已经在许多领域得到应用，如自动驾驶汽车、医疗诊断和推荐系统。
     """
     
-    print(f"查询: {query}")
-    print(f"上下文: {context}")
-    print(f"响应: {response}")
-    print("\n开始评估...")
+    print(f"Query: {query}")
+    print(f"Context: {context}")
+    print(f"Response: {response}")
+    print("\nStarting evaluation...")
     
-    # 评估响应
+    # Evaluate response
     evaluation = helpsteer.evaluator.evaluate_response(query, response, context)
     
-    # 显示评估结果
-    print("\n=== 评估结果 ===")
-    print(f"综合分数: {evaluation.overall_score}/10")
-    print("\n各维度分数:")
+    # Display evaluation results
+    print("\n=== Evaluation Results ===")
+    print(f"Overall Score: {evaluation.overall_score}/10")
+    print("\nDimension Scores:")
     for dimension, score in evaluation.scores.items():
         print(f"  {dimension.value}: {score}/10")
     
-    print(f"\n评估元数据: {evaluation.metadata}")
+    print(f"\nEvaluation Metadata: {evaluation.metadata}")
 
 
 def example_improvement():
-    """示例：响应改进"""
-    print("\n=== HelpSteer响应改进示例 ===")
+    """Example: Response improvement"""
+    print("\n=== HelpSteer Response Improvement Example ===")
     
-    # 设置LLM客户端
+    # Setup LLM client
     llm_client = setup_llm_client()
     if not llm_client:
         return
     
-    # 初始化HelpSteer系统
+    # Initialize HelpSteer system
     helpsteer = HelpSteerSystem(llm_client)
     
-    # 示例数据
+    # Example data
     query = "解释机器学习的基本概念"
     context = """
     机器学习是人工智能的一个分支，它使计算机能够在没有明确编程的情况下学习和改进。
@@ -102,48 +102,48 @@ def example_improvement():
     有很多种机器学习算法。
     """
     
-    print(f"查询: {query}")
-    print(f"当前响应: {current_response}")
+    print(f"Query: {query}")
+    print(f"Current Response: {current_response}")
     
-    # 指定改进目标
+    # Specify improvement targets
     improvement_targets = ["clarity", "helpfulness"]
     
-    print(f"\n改进目标: {improvement_targets}")
-    print("开始改进...")
+    print(f"\nImprovement Targets: {improvement_targets}")
+    print("Starting improvement...")
     
-    # 评估并改进
+    # Evaluate and improve
     result = helpsteer.evaluate_and_improve(
         query, context, current_response, improvement_targets
     )
     
-    # 显示结果
-    print("\n=== 改进结果 ===")
-    print(f"原始响应分数: {result['evaluation'].overall_score}/10")
+    # Display results
+    print("\n=== Improvement Results ===")
+    print(f"Original Response Score: {result['evaluation'].overall_score}/10")
     
     if result["improved_response"]:
-        print(f"改进后响应分数: {result['improved_evaluation'].overall_score}/10")
-        print(f"分数提升: {result['improvement_analysis']['score_improvement']:.2f}")
-        print("\n改进后的响应:")
+        print(f"Improved Response Score: {result['improved_evaluation'].overall_score}/10")
+        print(f"Score Improvement: {result['improvement_analysis']['score_improvement']:.2f}")
+        print("\nImproved Response:")
         print(result["improved_response"])
         
-        print("\n各维度改进:")
+        print("\nDimension Improvements:")
         for dim, improvement in result["improvement_analysis"]["dimension_improvements"].items():
             print(f"  {dim}: {improvement:+.2f}")
 
 
 def example_preference_learning():
-    """示例：偏好学习"""
-    print("\n=== HelpSteer偏好学习示例 ===")
+    """Example: Preference learning"""
+    print("\n=== HelpSteer Preference Learning Example ===")
     
-    # 设置LLM客户端
+    # Setup LLM client
     llm_client = setup_llm_client()
     if not llm_client:
         return
     
-    # 初始化HelpSteer系统
+    # Initialize HelpSteer system
     helpsteer = HelpSteerSystem(llm_client)
     
-    # 示例数据
+    # Example data
     query = "什么是深度学习？"
     context = """
     深度学习是机器学习的一个分支，它使用多层神经网络来模拟人脑的学习过程。
@@ -163,45 +163,45 @@ def example_preference_learning():
     这样可以学习到更复杂的东西。
     """
     
-    print(f"查询: {query}")
-    print(f"响应A: {response_a}")
-    print(f"响应B: {response_b}")
+    print(f"Query: {query}")
+    print(f"Response A: {response_a}")
+    print(f"Response B: {response_b}")
     
-    print("\n生成偏好数据...")
+    print("\nGenerating preference data...")
     
-    # 生成偏好数据
+    # Generate preference data
     preference_data = helpsteer.trainer.generate_preference_data(
         query, context, response_a, response_b
     )
     
-    # 显示结果
-    print("\n=== 偏好分析结果 ===")
-    print(f"更好的响应分数: {preference_data['better_score']}/10")
-    print(f"较差的响应分数: {preference_data['worse_score']}/10")
-    print(f"分数差异: {preference_data['score_difference']:.2f}")
+    # Display results
+    print("\n=== Preference Analysis Results ===")
+    print(f"Better Response Score: {preference_data['better_score']}/10")
+    print(f"Worse Response Score: {preference_data['worse_score']}/10")
+    print(f"Score Difference: {preference_data['score_difference']:.2f}")
     
-    print("\n偏好分析:")
+    print("\nPreference Analysis:")
     print(preference_data["analysis"])
     
-    # 保存偏好数据
+    # Save preference data
     output_file = "helpsteer_preference_data.json"
     helpsteer.trainer.save_preference_data(preference_data, output_file)
-    print(f"\n偏好数据已保存到: {output_file}")
+    print(f"\nPreference data saved to: {output_file}")
 
 
 def example_batch_processing():
-    """示例：批量处理"""
-    print("\n=== HelpSteer批量处理示例 ===")
+    """Example: Batch processing"""
+    print("\n=== HelpSteer Batch Processing Example ===")
     
-    # 设置LLM客户端
+    # Setup LLM client
     llm_client = setup_llm_client()
     if not llm_client:
         return
     
-    # 初始化HelpSteer系统
+    # Initialize HelpSteer system
     helpsteer = HelpSteerSystem(llm_client)
     
-    # 示例数据
+    # Example data
     test_cases = [
         {
             "query": "什么是神经网络？",
@@ -215,11 +215,11 @@ def example_batch_processing():
         }
     ]
     
-    print(f"开始批量评估 {len(test_cases)} 个测试用例...")
+    print(f"Starting batch evaluation of {len(test_cases)} test cases...")
     
     results = []
     for i, test_case in enumerate(test_cases, 1):
-        print(f"\n处理测试用例 {i}...")
+        print(f"\nProcessing test case {i}...")
         
         evaluation = helpsteer.evaluator.evaluate_response(
             test_case["query"], 
@@ -232,32 +232,32 @@ def example_batch_processing():
             "score": evaluation.overall_score
         })
     
-    # 显示汇总结果
-    print("\n=== 批量评估汇总 ===")
+    # Display summary results
+    print("\n=== Batch Evaluation Summary ===")
     total_score = sum(r["score"] for r in results)
     avg_score = total_score / len(results)
     
-    print(f"平均分数: {avg_score:.2f}/10")
-    print(f"最高分数: {max(r['score'] for r in results):.2f}/10")
-    print(f"最低分数: {min(r['score'] for r in results):.2f}/10")
+    print(f"Average Score: {avg_score:.2f}/10")
+    print(f"Highest Score: {max(r['score'] for r in results):.2f}/10")
+    print(f"Lowest Score: {min(r['score'] for r in results):.2f}/10")
     
-    print("\n详细结果:")
+    print("\nDetailed Results:")
     for result in results:
-        print(f"用例 {result['case']}: {result['score']:.2f}/10")
+        print(f"Case {result['case']}: {result['score']:.2f}/10")
 
 
 def main():
-    """主函数"""
-    print("HelpSteer系统使用示例")
+    """Main function"""
+    print("HelpSteer System Usage Examples")
     print("=" * 50)
     
-    # 检查配置
+    # Check configuration
     if not os.getenv("AZURE_OPENAI_API_KEY"):
-        print("请先配置Azure OpenAI API密钥")
-        print("可以使用环境变量或运行 config.py")
+        print("Please configure Azure OpenAI API key first")
+        print("You can use environment variables or run config.py")
         return
     
-    # 运行示例
+    # Run examples
     try:
         example_evaluation()
         example_improvement()
@@ -265,10 +265,10 @@ def main():
         example_batch_processing()
         
         print("\n" + "=" * 50)
-        print("所有示例运行完成！")
+        print("All examples completed!")
         
     except Exception as e:
-        print(f"运行示例时出错: {e}")
+        print(f"Error running examples: {e}")
         import traceback
         traceback.print_exc()
 

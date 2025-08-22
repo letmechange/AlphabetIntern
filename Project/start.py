@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-RAG系统启动脚本
-提供简单的命令行界面来启动和使用RAG系统
+RAG System Startup Script
+Provides a simple command-line interface to start and use the RAG system
 """
 
 import os
@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 def check_dependencies():
-    """检查必要的依赖是否已安装"""
+    """Check if necessary dependencies are installed"""
     required_packages = [
         'langchain',
         'langchain-community', 
@@ -27,24 +27,24 @@ def check_dependencies():
             missing_packages.append(package)
     
     if missing_packages:
-        print(" 缺少以下依赖包:")
+        print("  Missing the following dependency packages:")
         for package in missing_packages:
             print(f"   - {package}")
-        print("\n请运行以下命令安装:")
+        print("\nPlease run the following command to install:")
         print(f"pip install {' '.join(missing_packages)}")
         return False
     
-    print(" 所有依赖包已安装")
+    print("  All dependency packages are installed")
     return True
 
 def check_config():
-    """检查配置文件"""
+    """Check configuration file"""
     config_file = Path("config.py")
     if not config_file.exists():
-        print(" 配置文件 config.py 不存在")
+        print("  Configuration file config.py does not exist")
         return False
     
-    # 检查环境变量
+    # Check environment variables
     required_env_vars = ["AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT"]
     missing_vars = []
     
@@ -53,59 +53,59 @@ def check_config():
             missing_vars.append(var)
     
     if missing_vars:
-        print("  以下环境变量未设置:")
+        print("  The following environment variables are not set:")
         for var in missing_vars:
             print(f"   - {var}")
-        print("\n请在 config.py 中设置这些变量")
+        print("\nPlease set these variables in config.py")
         return False
     
-    print(" 配置检查通过")
+    print("  Configuration check passed")
     return True
 
 def show_menu():
-    """显示主菜单"""
+    """Display main menu"""
     print("\n" + "="*50)
-    print(" RAG系统 - 检索增强生成")
+    print(" RAG System - Retrieval-Augmented Generation")
     print("="*50)
-    print("请选择运行模式:")
-    print("1. 交互式查询 (推荐)")
-    print("2. 示例查询")
-    print("3. 批量查询")
-    print("4. 系统信息")
-    print("5. 更新文档库")
-    print("0. 退出")
+    print("Please select running mode:")
+    print("1. Interactive Query (Recommended)")
+    print("2. Example Query")
+    print("3. Batch Query")
+    print("4. System Information")
+    print("5. Update Document Library")
+    print("0. Exit")
     print("="*50)
 
 def run_interactive():
-    """运行交互式查询"""
-    print("\n 启动交互式查询模式...")
+    """Run interactive query"""
+    print("\n Starting interactive query mode...")
     try:
         from example_usage import interactive_mode
         interactive_mode()
     except Exception as e:
-        print(f" 启动交互式模式失败: {str(e)}")
+        print(f" Failed to start interactive mode: {str(e)}")
 
 def run_example():
-    """运行示例查询"""
-    print("\n 运行示例查询...")
+    """Run example query"""
+    print("\n Running example queries...")
     try:
         from example_usage import example_usage
         example_usage()
     except Exception as e:
-        print(f" 运行示例查询失败: {str(e)}")
+        print(f" Failed to run example queries: {str(e)}")
 
 def run_batch():
-    """运行批量查询"""
-    print("\n 运行批量查询...")
+    """Run batch query"""
+    print("\n Running batch queries...")
     try:
         from example_usage import batch_query_mode
         batch_query_mode()
     except Exception as e:
-        print(f" 运行批量查询失败: {str(e)}")
+        print(f" Failed to run batch queries: {str(e)}")
 
 def show_system_info():
-    """显示系统信息"""
-    print("\n 系统信息:")
+    """Display system information"""
+    print("\n System Information:")
     try:
         from AlphabetIntern.Project.RAGSystem import RAGSystem
         rag = RAGSystem()
@@ -113,20 +113,20 @@ def show_system_info():
         
         for key, value in info.items():
             if key == "documents":
-                print(f"  {key}: {len(value)} 个文档")
-                for doc in value[:3]:  # 只显示前3个
+                print(f"  {key}: {len(value)} documents")
+                for doc in value[:3]:  # Only show first 3
                     print(f"    - {Path(doc).name}")
                 if len(value) > 3:
-                    print(f"    ... 还有 {len(value) - 3} 个文档")
+                    print(f"    ... and {len(value) - 3} more documents")
             else:
                 print(f"  {key}: {value}")
                 
     except Exception as e:
-        print(f" 获取系统信息失败: {str(e)}")
+        print(f" Failed to get system information: {str(e)}")
 
 def update_documents():
-    """更新文档库"""
-    print("\n 更新文档库...")
+    """Update document library"""
+    print("\n Updating document library...")
     try:
         from AlphabetIntern.Project.RAGSystem import RAGSystem
         rag = RAGSystem()
@@ -134,38 +134,38 @@ def update_documents():
         sample_folder = "./Sample"
         if os.path.exists(sample_folder):
             rag.update_documents(sample_folder)
-            print(" 文档库更新完成!")
+            print(" Document library update complete!")
         else:
-            print(f"  Sample文件夹不存在: {sample_folder}")
-            print("请将文档放入 Sample 文件夹中")
+            print(f"  Sample folder does not exist: {sample_folder}")
+            print("Please put documents in the Sample folder")
             
     except Exception as e:
-        print(f" 更新文档库失败: {str(e)}")
+        print(f" Failed to update document library: {str(e)}")
 
 def main():
-    """主函数"""
-    print(" 检查系统环境...")
+    """Main function"""
+    print(" Checking system environment...")
 
-    # 检查依赖
+    # Check dependencies
     if not check_dependencies():
         return
     
-    # 检查配置
+    # Check configuration
     if not check_config():
-        print("\n 请先配置API密钥后再运行系统")
+        print("\n Please configure API keys before running the system")
         return
     
-    print(" 系统环境检查完成!")
+    print(" System environment check complete!")
     
-    # 主循环
+    # Main loop
     while True:
         show_menu()
         
         try:
-            choice = input("\n请输入选择 (0-5): ").strip()
+            choice = input("\nPlease enter your choice (0-5): ").strip()
             
             if choice == "0":
-                print(" 再见!")
+                print(" Goodbye!")
                 break
             elif choice == "1":
                 run_interactive()
@@ -178,13 +178,13 @@ def main():
             elif choice == "5":
                 update_documents()
             else:
-                print(" 无效选择，请重新输入")
+                print(" Invalid choice, please re-enter")
                 
         except KeyboardInterrupt:
-            print("\n 再见!")
+            print("\n Goodbye!")
             break
         except Exception as e:
-            print(f" 发生错误: {str(e)}")
+            print(f" An error occurred: {str(e)}")
 
 if __name__ == "__main__":
     main() 
