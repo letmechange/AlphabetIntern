@@ -18,9 +18,9 @@ class EvaluationDimension(Enum):
     """Evaluation dimension enumeration"""
     HELPFULNESS = "helpfulness"  # Helpfulness
     CORRECTNESS = "correctness"  # Correctness
-    CLARITY = "clarity"          # Clarity
-    CONCISENESS = "conciseness"  # Conciseness
-    RELEVANCE = "relevance"      # Relevance
+    COHERENCE = "coherence"  # Coherence
+    COMPLEXITY = "complexity"  # Complexity
+    VERBOISITY = "verbosity"  # Verbosity
 
 
 @dataclass
@@ -29,13 +29,13 @@ class HelpSteerResponse:
     query: str
     response: str
     context: str
-    scores: Dict[EvaluationDimension, float]
+    scores: Dict[EvaluationDimension, int]
     overall_score: float
     metadata: Dict[str, Any]
 
 
 class HelpSteerEvaluator:
-    """HelpSteer evaluator"""
+    """HelpSteer evaluator for response assessment"""
     
     def __init__(self, llm_client):
         self.llm_client = llm_client
@@ -55,17 +55,29 @@ Query: {query}
 Context: {context}
 Response: {response}
 
-Rate the helpfulness of the response on a scale from 1 to 10, where:
-1 = Not helpful at all, doesn't address the query
-5 = Somewhat helpful, partially addresses the query
-10 = Extremely helpful, fully addresses the query with valuable information
+Rate the helpfulness of the response on a scale from 0 to 4, where:
+0 = The response is not useful or helpful at all. The response completely missed the essence
+of what the user wanted.
 
-Consider:
+1 = The response is borderline unhelpful and mostly does not capture what the user was looking
+for, but is still usable and helpful in a small way.
+
+2 = The response is partially helpful but misses the overall goal of the user's query/input
+in some way. The response did not fully satisfy what the user was looking for.
+
+3 = The response is mostly helpful and mainly aligned with what the user was looking for,
+but there is still some room for improvement.
+
+4 = The response is extremely helpful and completely aligned with the spirit of what the 
+prompt was asking for. 
+
+
+Consider: 
 - Does the response directly answer the user's question?
 - Does it provide useful and actionable information?
 - Does it go beyond the obvious to provide deeper insights?
 
-Score (1-10):
+Score (0-4):
 """
         )
         
@@ -79,89 +91,128 @@ Query: {query}
 Context: {context}
 Response: {response}
 
-Rate the correctness of the response on a scale from 1 to 10, where:
-1 = Completely incorrect, contradicts the context
-5 = Partially correct, some inaccuracies
-10 = Completely correct, accurately reflects the context
+Rate the correctness of the response on a scale from 0 to 4, where:
+0 = The response is completely incorrect. All information provided is wrong, false or hallucinated.
+If the prompt asks the assistant to do a task the task is not at all atempted, or the wrong task was attempted in the response.
+The response is completely irrelevant to the prompt.
+
+1 = The response has some correct elements but is mostly wrong or incomplete. The response may
+contain multiple instances of hallucinations, false information, misleading information, or irrelevant
+information. If the prompt asks the assistant to do a task, the task was attempted with a small amount of success.
+
+2 = The response contains a mix of correct and incorrect information. The response may miss some details, contain misleading information, 
+or minor hallucinations, but is more or less aligned with what the prompt asks for. If the prompt asks the assistant to perform a task, 
+the task is attempted with moderate success but still has clear room for improvement. 
+
+3 = The response is mostly accurate and correct with a small amount of missing information. It contains no misleading information or 
+hallucinations. If the prompt asks the assistant to perform a task, the task is mostly successfully attempted.
+
+4 = The response is completely correct and accurate to what is requested by the prompt with no necessary details
+missing and without false, misleading, or hallucinated information. If the prompt asks the assistant to do a task, the 
+task is completely done and addressed in the response.
 
 Consider:
 - Are the facts and claims in the response supported by the context?
 - Are there any factual errors or misrepresentations?
 - Does the response accurately interpret the source material?
 
-Score (1-10):
+Score (0-4):
 """
         )
         
-        # Clarity evaluation
-        prompts[EvaluationDimension.CLARITY] = PromptTemplate(
+        # Coherence evaluation
+        prompts[EvaluationDimension.COHERENCE] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
-You are evaluating the clarity of an AI assistant's response.
+You are evaluating the coherence of an AI assistant's response.
 
 Query: {query}
 Context: {context}
 Response: {response}
 
-Rate the clarity of the response on a scale from 1 to 10, where:
-1 = Very unclear, confusing and hard to understand
-5 = Somewhat clear, requires effort to understand
-10 = Very clear, easy to understand and well-structured
+Rate the coherence of the response on a scale from 0 to 4, where:
+0 = The response is completely incomprehensible and no clear meaning or sensible message can be discerned from it.
+
+1 = The response is mostly hard to follow, with inconsistencies, contradictions, confusing logic flow, or unclear
+language used throughout, but here are some coherent/clear parts.
+
+2 = There response is a little unclear. There are some inconsistencies or contradictions, run on sentences, confusing statements, 
+or hard to follow sections of the response.
+
+3 = The response is mostly clear and coherent, but there may be one or two places where the wording is confusing or the flow of the reponse
+is a little hard to follow. Overall, the response can mostly be followed with a little room for improvement.
+
+4 = The response is perfectly clear and slef-consistent throughout. There are no contradictory assertions or statements, the writing flows
+logically, and following the train of thought/story is not challenging.
 
 Consider:
 - Is the response well-organized and logically structured?
 - Is the language clear and accessible?
 - Are complex concepts explained in understandable terms?
 
-Score (1-10):
+Score (0-4):
 """
         )
         
-        # Conciseness evaluation
-        prompts[EvaluationDimension.CONCISENESS] = PromptTemplate(
+        # complexity evaluation
+        prompts[EvaluationDimension.COMPLEXITY] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
-You are evaluating the conciseness of an AI assistant's response.
+You are evaluating the complexity of an AI assistant's response.
 
 Query: {query}
 Context: {context}
 Response: {response}
 
-Rate the conciseness of the response on a scale from 1 to 10, where:
-1 = Very verbose, unnecessarily long and repetitive
-5 = Moderately concise, some redundancy
-10 = Very concise, gets to the point efficiently
+Rate the complexity of the response on a scale from 0 to 4, where:
+0 = The response uses very easy to understand language that is clear and completely interpretable by children, adults, and anyone
+with a functional command of the language
 
-Consider:
-- Does the response avoid unnecessary repetition?
-- Is the information presented efficiently?
-- Could the same information be conveyed more briefly?
+1 = The response uses relatively straightforward language and wording, but some schooling through elementary
+or a middle school in the language might be required to understand the response.
 
-Score (1-10):
+2 = People who have completed up through a high school education will probably be able to uderstand the vocabulary and sentence structure
+used, but those at the basic level or children might struggle to understand the response.
+
+3 = The response uses a fairly sophisticated vocabulary and terminology. Someone majoring in this subject at a college or university could have written it and 
+would understand the response. An average adult who does not work or study in this area could not have written the response.
+
+4 = An expert in the field or area could have written the response. It uses specific and technically relevant vocabulary. it contains elevated language that 
+someone at the simple professional language of a lawyer, scientist, engineer, or doctor falls into this category.
+
+
+Score (0-4):
 """
         )
         
-        # Relevance evaluation
-        prompts[EvaluationDimension.RELEVANCE] = PromptTemplate(
+        # verbosity evaluation
+        prompts[EvaluationDimension.VERBOISITY] = PromptTemplate(
             input_variables=["query", "response", "context"],
             template="""
-You are evaluating the relevance of an AI assistant's response to the user query.
+You are evaluating the verbosity of an AI assistant's response to the user query.
 
 Query: {query}
 Context: {context}
 Response: {response}
 
-Rate the relevance of the response on a scale from 1 to 10, where:
-1 = Completely irrelevant, doesn't address the query
-5 = Somewhat relevant, partially addresses the query
-10 = Highly relevant, directly addresses all aspects of the query
+Rate the verbosity of the response on a scale from 0 to 4, where:
+0 = The response is short, to the point, and the most concise it cna be. No additional information is provided outside of
+what is requested by the prompt.
 
-Consider:
-- Does the response stay focused on the user's question?
-- Are the topics and information directly related to the query?
-- Does it avoid going off-topic or providing irrelevant information?
+1 = The response is on the shorter side but could still have words, details, and/or text removed before it's at a bare minimum of 
+what the response is trying to convey.
 
-Score (1-10):
+2 = The response isn't especially long or short given what the prompt is asking of the model. The length is adequate for conveying a full response but isn't 
+particularly wordy nor particularly concise.
+
+3 = The response is on the longer side but could still have more added to it before it is considered fully detailed or rambling.
+
+4 = The response is particularly lengthy, wordy, and/or extensive with extra details given what the prompt requested from the assistant model. The response can 
+be verbose regardless of if the length is due to repetition and incoherency or if it is due to rich and insightful detail.
+
+
+
+Score (0-4):
 """
         )
         
@@ -183,7 +234,7 @@ Score (1-10):
                 scores[dimension] = score
             except Exception as e:
                 print(f"Error evaluating dimension {dimension.value}: {e}")
-                scores[dimension] = 5.0  # Default medium score
+                scores[dimension] = 2  # Default medium score
         
         # Calculate overall score (weighted average)
         overall_score = self._calculate_overall_score(scores)
@@ -205,25 +256,25 @@ Score (1-10):
         try:
             # Try to parse number directly
             score = float(score_str)
-            return max(1.0, min(10.0, score))  # Limit to 1-10 range
+            return max(0, min(4, score))  # Limit to 0-4 range
         except ValueError:
             # If direct parsing fails, try to extract number from text
             import re
             numbers = re.findall(r'\d+(?:\.\d+)?', score_str)
             if numbers:
                 score = float(numbers[0])
-                return max(1.0, min(10.0, score))
-            return 5.0  # Default score
+                return max(0, min(4, score))
+            return 2  # Default score
     
     def _calculate_overall_score(self, scores: Dict[EvaluationDimension, float]) -> float:
         """Calculate overall score"""
         # Can set different weights for different dimensions
         weights = {
-            EvaluationDimension.HELPFULNESS: 0.3,
-            EvaluationDimension.CORRECTNESS: 0.3,
-            EvaluationDimension.CLARITY: 0.2,
-            EvaluationDimension.CONCISENESS: 0.1,
-            EvaluationDimension.RELEVANCE: 0.1
+            EvaluationDimension.HELPFULNESS: 0.1,
+            EvaluationDimension.CORRECTNESS: 0.7,
+            EvaluationDimension.COHERENCE: 0.2,
+            EvaluationDimension.COMPLEXITY: 0.0,
+            EvaluationDimension.VERBOISITY: -0.15
         }
         
         weighted_sum = sum(scores[dim] * weights[dim] for dim in scores.keys())
@@ -359,7 +410,7 @@ Improved Response:
         
         # Format evaluation results
         eval_text = "\n".join([
-            f"- {dim.value}: {score}/10" 
+            f"- {dim.value}: {score}/4" 
             for dim, score in evaluation.scores.items()
         ])
         

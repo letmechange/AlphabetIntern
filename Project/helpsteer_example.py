@@ -69,10 +69,10 @@ def example_evaluation():
     
     # Display evaluation results
     print("\n=== Evaluation Results ===")
-    print(f"Overall Score: {evaluation.overall_score}/10")
+    print(f"Overall Score: {evaluation.overall_score:.2f}")
     print("\nDimension Scores:")
     for dimension, score in evaluation.scores.items():
-        print(f"  {dimension.value}: {score}/10")
+        print(f"  {dimension.value}: {score}/4")
     
     print(f"\nEvaluation Metadata: {evaluation.metadata}")
 
@@ -118,10 +118,10 @@ def example_improvement():
     
     # Display results
     print("\n=== Improvement Results ===")
-    print(f"Original Response Score: {result['evaluation'].overall_score}/10")
+    print(f"Original Response Score: {result['evaluation'].overall_score:.2f}")
     
     if result["improved_response"]:
-        print(f"Improved Response Score: {result['improved_evaluation'].overall_score}/10")
+        print(f"Improved Response Score: {result['improved_evaluation'].overall_score:.2f}")
         print(f"Score Improvement: {result['improvement_analysis']['score_improvement']:.2f}")
         print("\nImproved Response:")
         print(result["improved_response"])
@@ -176,8 +176,8 @@ def example_preference_learning():
     
     # Display results
     print("\n=== Preference Analysis Results ===")
-    print(f"Better Response Score: {preference_data['better_score']}/10")
-    print(f"Worse Response Score: {preference_data['worse_score']}/10")
+    print(f"Better Response Score: {preference_data['better_score']:.2f}")
+    print(f"Worse Response Score: {preference_data['worse_score']:.2f}")
     print(f"Score Difference: {preference_data['score_difference']:.2f}")
     
     print("\nPreference Analysis:")
@@ -237,13 +237,13 @@ def example_batch_processing():
     total_score = sum(r["score"] for r in results)
     avg_score = total_score / len(results)
     
-    print(f"Average Score: {avg_score:.2f}/10")
-    print(f"Highest Score: {max(r['score'] for r in results):.2f}/10")
-    print(f"Lowest Score: {min(r['score'] for r in results):.2f}/10")
+    print(f"Average Score: {avg_score:.2f}")
+    print(f"Highest Score: {max(r['score'] for r in results):.2f}")
+    print(f"Lowest Score: {min(r['score'] for r in results):.2f}")
     
     print("\nDetailed Results:")
     for result in results:
-        print(f"Case {result['case']}: {result['score']:.2f}/10")
+        print(f"Case {result['case']}: {result['score']:.2f}")
 
 
 def main():
