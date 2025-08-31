@@ -1,0 +1,44 @@
+# Vector database files
+vector_db/
+vector_db_*/
+**/vector_db/
+**/chroma.sqlite3
+*.bin
+*.pickle
+
+# Large files
+*.data_level0.bin
+*.header.bin
+*.length.bin
+*.link_lists.bin
+*.index_metadata.pickle
+
+# Large CSV files
+Project/Test/*.csv
+Project/Sample/Excel/*.csv
+**/CAvideos.csv
+**/DEvideos.csv
+**/FRvideos.csv
+**/GBvideos.csv
+**/COREVQA*.csv
+**/ncr_ride_bookings.csv
+**/voice_search_query_captures.csv
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+.venv
+env/
+venv/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
